@@ -1,7 +1,8 @@
 import pygame
+from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
 
 from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, CLOUD
-from dino_runner.components.dinosaur import Dinosaur ##
+from dino_runner.components.dinosaur import Dinosaur
 
 class Game:
     def __init__(self):
@@ -16,7 +17,8 @@ class Game:
         self.y_pos_bg = 380
         self.x_pos_cl = 200
         self.y_pos_cl = 100
-        self.player = Dinosaur() ##
+        self.player = Dinosaur()
+        self.obstacle_manager = ObstacleManager()
 
     def run(self):
         # Game loop: events - update - draw
@@ -33,25 +35,30 @@ class Game:
                 self.playing = False
 
     def update(self):
-        user_input = pygame.key.get_pressed()  ##
-        self.player.update(user_input)  ##
+        user_input = pygame.key.get_pressed()
+        self.player.update(user_input) #update de la clase dinosaur
+        self.obstacle_manager.update(self)
 
     def draw(self):
         self.clock.tick(FPS)
         self.screen.fill((255, 255, 255))
-        self.cloud()
         self.draw_background()
-        self.player.draw(self.screen) ##
+        self.cloud()
+        self.player.draw(self.screen) #draw de la clase dinusaur
+        self.obstacle_manager.draw(self.screen)
         pygame.display.update()
         pygame.display.flip()
 
     def cloud(self):
         image_width = CLOUD.get_width()
         self.screen.blit(CLOUD, (self.x_pos_cl, self.y_pos_cl))
-        self.screen.blit(CLOUD, (image_width + self.x_pos_cl, self.y_pos_cl))
+        if self.x_pos_cl < -image_width:
+            self.x_pos_cl = SCREEN_WIDTH
+        self.x_pos_cl -= self.game_speed
+        
 
     def draw_background(self):
-        image_width = BG.get_width()
+        image_width = BG.get_width() #obtiene el ancho de la imagen
         self.screen.blit(BG, (self.x_pos_bg, self.y_pos_bg))
         self.screen.blit(BG, (image_width + self.x_pos_bg, self.y_pos_bg))
         if self.x_pos_bg <= -image_width:
